@@ -1,0 +1,65 @@
+EXPERIMENT:
+  PROJECT: "distill_cifar100"
+  NAME: ""
+  TAG: "manifoldalignkd_cka,res110_res32"
+
+DATASET:
+  TYPE: "cifar100"
+  NUM_WORKERS: 4
+  NUM_CLASSES: 100
+  TEST:
+    BATCH_SIZE: 512
+
+DISTILLER:
+  TYPE: "ManifoldAlignKD_CKA"
+  TEACHER: "resnet110"
+  STUDENT: "resnet32"
+
+SOLVER:
+  TRAINER: "base"
+  TYPE: "SGD"
+  BATCH_SIZE: 64
+  EPOCHS: 240
+  LR: 0.05
+  LR_DECAY_STAGES: [150, 180, 210]
+  LR_DECAY_RATE: 0.1
+  MOMENTUM: 0.9
+  WEIGHT_DECAY: 0.0005
+
+LOG:
+  PREFIX: "./output"
+  WANDB: false
+  TENSORBOARD_FREQ: 200
+  SAVE_CHECKPOINT_FREQ: 40
+
+ManifoldAlignKD_CKA:
+  CE_WEIGHT: 1.0
+  KD_WEIGHT: 1.0
+  KD_T: 4.0
+  BASE_TYPE: "dkd"          # 与原 VGG 配置一致
+  WARMUP: 1
+
+  # 对齐层配置：保留原 vgg13_vgg8 的层与权重
+  LAYER_IDS: [-1]
+  LAYER_WEIGHTS: [1.0]
+
+  # 子空间与 MMD 设置
+  SUBSPACE_DIM: 32
+  MMD:
+    KERNEL: "linear"
+    SIGMA: 1.0
+
+  # 几何保持超参数：
+  GEO_TOPK: 8
+  LAMBDA_MMD: 1.0
+  LAMBDA_GEO: 1.0
+
+  # μ 自适应（CKA），参考文件1 的写法
+  MU:
+    MODE: "cka"
+    BASE: 0.5
+    ALPHA: 3.0
+    CENTER: 0.5
+
+DKD:
+  BETA: 2.0

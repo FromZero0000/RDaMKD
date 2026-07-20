@@ -1,0 +1,41 @@
+EXPERIMENT:
+  NAME: "sot_res50_mv1"
+  TAG: "sot,res50,mobilenetv1"
+  PROJECT: "imagenet_sot"
+
+DATASET:
+  TYPE: "imagenet"
+  NUM_WORKERS: 32
+  TEST:
+    BATCH_SIZE: 128
+
+DISTILLER:
+  TYPE: "SOT"           # 切换为你的方法
+  TEACHER: "ResNet50"
+  STUDENT: "MobileNetV1"
+
+SOLVER:
+  BATCH_SIZE: 256
+  EPOCHS: 120
+  LR: 0.2
+  LR_DECAY_STAGES: [30, 60, 90]
+  LR_DECAY_RATE: 0.1
+  WEIGHT_DECAY: 0.0001
+  MOMENTUM: 0.9
+  TYPE: "SGD"
+
+LOG:
+  TENSORBOARD_FREQ: 50
+  SAVE_CHECKPOINT_FREQ: 10
+
+SOT:
+  CE_WEIGHT: 1.0
+  KD_WEIGHT: 8.0         # <--- 增强：单层特征蒸馏需要更大的梯度话语权 (6.0 -> 8.0)
+  EPSILON: 0.05
+  N_ITER: 3              # <--- 削弱：减少迭代，防止过拟合极端的传输路径 (5 -> 3)
+  LAMBDA_SPATIAL: 0.25   # 保持 0.25 的黄金弹性比例
+  POOL_SIZE: 8
+  ALPHA: 0.5
+  TEMP: 2.0
+  ALIGN_LAYERS: 1
+
